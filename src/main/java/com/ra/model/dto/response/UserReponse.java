@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+// thông tin trả ra
 public class UserReponse {
     private Long id;
     private String fullName;

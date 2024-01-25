@@ -38,12 +38,15 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests((auth)->
                         auth.requestMatchers("/v1/auth/**").permitAll() // khoong cần đăng nhập
-                                .requestMatchers("/v1/admin/categories"). hasAuthority("ROLE_ADMIN")  // cần phải đăng nhập
+                                .requestMatchers("/v1/admin/**").hasAuthority("ADMIN")  // cần phải đăng nhập
                                 .anyRequest().authenticated()
                         )
-                .exceptionHandling((auth)->auth.authenticationEntryPoint(jwtEntryPoint).accessDeniedHandler(accessDenied))
-                .sessionManagement((auth)-> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .exceptionHandling(
+                        (auth)->auth.authenticationEntryPoint(jwtEntryPoint)
+                .accessDeniedHandler(accessDenied)
+                )
+             .sessionManagement((auth)-> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtTokenFilter,UsernamePasswordAuthenticationFilter.class).build();
     }
     //  mã hóa mật khẩu
     @Bean
@@ -57,5 +60,4 @@ public class WebSecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
-
 }

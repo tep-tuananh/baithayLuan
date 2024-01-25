@@ -26,32 +26,29 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String token=getTokenFromRequest(request);
-            if(token!=null && jwtProvider.validate(token))
-            {
-                String userName= jwtProvider.getUserNameFromToken(token);
-                UserDetails userDetails =userDetailService.loadUserByUsername(userName);
-                if (userDetails!=null)
-                {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            String token = getTokenFromRequest(request);
+            if (token != null && jwtProvider.validate(token)) {
+                String username = jwtProvider.getUserNameFromToken(token);
+                UserDetails userDetails = userDetailService.loadUserByUsername(username);
+                if (userDetails != null) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        }catch (Exception exception)
-        {
-            logger.error("Sai thông tin {}",exception.getMessage());
+        } catch (Exception e) {
+            logger.error("Un Authentication ->> " + e.getMessage());
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
     public String getTokenFromRequest(HttpServletRequest request)
     {
         String header = request.getHeader("Authorization");
-        if(header!=null && header.startsWith("Bearer"))
-        {
-            header.substring(7);
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
         }
         return null;
     }
+
 }
